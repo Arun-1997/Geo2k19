@@ -1,0 +1,30 @@
+
+			body {
+				margin: 0;
+				height: 100vh;
+			}
+			canvas {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				z-index: 1;
+			}
+			.controls {
+				position: absolute;
+				top : 0;
+				right: 0;
+				z-index: 11;
+			}
+
+			.btn {
+				display: block;
+			}
+
+[id="toggle"] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 101;
+}
