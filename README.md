@@ -1,2 +1,1 @@
-# GeoHorizon2k19
-Website for geohorizon 2019
+# GeoHorizonh-2k18
