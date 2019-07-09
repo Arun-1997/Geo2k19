@@ -31,7 +31,9 @@ $(window).ready(hideLoader);
 init();
     
 $(document).ready(function(){
-    animate();
+	if(init() == true){
+	    animate();
+	}
 })
 
 
@@ -84,7 +86,7 @@ var x,y;
       //
   window.addEventListener('resize', onResize);
 //   animate();
-
+return true;
 }
 
 function onDocumentMouseDown(event) {
