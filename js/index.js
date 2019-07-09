@@ -30,8 +30,9 @@ function hideLoader() {
 $(window).ready(hideLoader);
 init();
     
-
-    // animate();
+$(document).ready(function(){
+    animate();
+})
 
 
 function init() {
