@@ -99,7 +99,7 @@ $(window).ready(hideLoader);
 
 
 // AddParticles()
-var message = ["About","Sponsors","Events","Accomodation","Workshops","Gallery"];
+var message = ["About","Sponsors","Events","Accommodation","Workshops","Gallery"];
 var shapes = [];
 var geom = [];
 
