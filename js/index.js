@@ -1,96 +1,249 @@
-/* three.js set up */
-'use strict';
-//earthmap1k
-let scene,
-    camera,
-    renderer,
-    controls;
 
-let particles,
-    sphere,
-    item,
-    planet;
-    
-let geohorizon,timeline,Events,stack,Engadget,google;
-let width = window.innerWidth,
-    height = window.innerHeight;
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 /* stars colors */
-const colors = [0xffffff, 0xfff7cc, 0xfff7cc];
-var items = [];
-var names;
-var context1,canvas1,texture1,sprite1;
+var colors = [0xffffff, 0xfff7cc, 0xfff7cc];
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+var sphere_geometry = new THREE.IcosahedronGeometry(100,5);
+var geohorizon,timeline,Events,stack,Engadget,google;
+
+var item1,item2,item3,item4,item5,item6;
+var sphere = new THREE.Group();
+// sphere.rotation.set(0.4,0.3,0);
 var projector, mouse = { x: 0, y: 0 }, INTERSECTED;
 var raycaster = new THREE.Raycaster(); // create once
 var mouse = new THREE.Vector2(); // create once
 
+var img = 'https://vignette.wikia.nocookie.net/marvelcrossroads/images/7/71/Earth-map.jpg/revision/latest?cb=20180513012905';
+
+var planetMaterial = new THREE.MeshPhongMaterial( { 
+            color: 0x3b041f,
+            wireframe:true,
+            wireframeLinejoin:"miter",
+            wireframeLinewidth:"0.1" } );
+THREE.ImageUtils.crossOrigin = '';
+
+// planetMaterial.map    = THREE.ImageUtils.loadTexture(img);
+planetMaterial.map    = THREE.TextureLoader(img);
+var radius = 100;
+const planetGeometry = new THREE.IcosahedronGeometry(radius,3);
+
+planet = new THREE.Mesh(planetGeometry, planetMaterial);
+/* sphere shadow */
+planet.castShadow = true;
+planet.receiveShadow = true;
+planet.position.set(0,0, 0);
+// sphere.add(planet);
+
+
+//Add sphere
+// var planet = new THREE.Mesh( sphere_geometry, material );
+// planet.castShadow = true;
+// planet.receiveShadow = true;
+// planet.position.set(0,0, 0);
+sphere.add(planet)
+scene.add( sphere );
+// renderer.setClearColor(0x000000);
+renderer.shadowMap.enabled = true;
+camera.position.z = 200;
+
+var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+controls.minDistance = 100;
+controls.maxDistance = 500;
+const ambientLight = new THREE.AmbientLight();
+scene.add(ambientLight);
+/* light controls (local sun) */
+const light = new THREE.DirectionalLight();
+light.position.set(200, 100, 200);
+light.castShadow = false;
+light.shadow.camera.left = -100;
+light.shadow.camera.right = 100;
+light.shadow.camera.top = 100;
+light.shadow.camera.bottom = -100;
+scene.add(light);
+
 
 function hideLoader() {
-    $('#loading_css').hide();
+  $('#loading_css').hide();
 }
 $(window).ready(hideLoader);
-init();
-    
-$(document).ready(function(){
-	if(init() == true){
-	    animate();
-	}
+
+//Add particles
+// function AddParticles(){
+    var particles = new THREE.Group();
+
+
+    const geometry = new THREE.TetrahedronGeometry(1, 1);
+    /* stars controls */
+    for (let i = 0; i < 800; i ++) {
+      const material = new THREE.MeshPhongMaterial({
+        color: colors[Math.floor(Math.random() * colors.length)],
+        flatShading : THREE.FlatShading
+      });
+      /* stars positioning */
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set((Math.random() - 0.5) * 1500,
+                        (Math.random() - 0.5) * 1500,
+                        (Math.random() - 0.5) * 1500);
+      mesh.updateMatrix();
+      mesh.matrixAutoUpdate = false;
+      particles.add(mesh);
+    }
+    scene.add(particles);
+// } 
+
+
+
+
+// AddParticles()
+var message = ["About","Sponsors","Events","Accomodation","Workshops","Gallery"];
+var shapes = [];
+var geom = [];
+
+var loader = new THREE.FontLoader();
+loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+  var xMid;
+  var color = 0xffffff;
+  var matDark = new THREE.LineBasicMaterial( {
+    color: color,
+    side: THREE.DoubleSide
+  } );
+  var matLite = new THREE.MeshBasicMaterial( {
+    color: color,
+    transparent: true,
+    opacity:1,
+    side: THREE.DoubleSide
+  } );
+  for(var j=0;j<=5;j++){
+    shapes.push(font.generateShapes( message[j], 5 ));
+    geom.push(new THREE.ShapeBufferGeometry( shapes[j]));
+    geom[j].computeBoundingBox();
+
+}
+
+
+
+var item_position = radius + 5.0;
+
+item1 = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 2.5), new THREE.MeshBasicMaterial({wireframe: false}));
+item1.userData = {
+  // URL: "http://google.com"
+ URL: "about.html"
+};
+item1.geometry.translate(0,0,item_position);
+geom[0].translate( -13, 8, item_position )
+geohorizon = new THREE.Mesh( geom[0], matLite );
+geohorizon.userData = item1.userData;
+scene.add( geohorizon );      
+scene.add(item1)
+
+item2 = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 2.5), new THREE.MeshBasicMaterial({wireframe: false}));
+
+item2.userData = {
+  URL: "sponsors.html"
+};
+item2.geometry.translate(0,item_position,0);
+geom[1].translate( -10,item_position+7,0 );
+timeline = new THREE.Mesh( geom[1], matLite );
+timeline.userData = item2.userData;
+scene.add(timeline);
+scene.add(item2)
+
+item3 = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 2.5), new THREE.MeshBasicMaterial({wireframe: false}));
+item3.userData = {
+  URL: "events.html"
+};
+item3.geometry.translate(item_position,0,0);
+geom[2].translate(item_position,7, 0  );
+Events = new THREE.Mesh( geom[2], matLite );
+Events.userData = item3.userData
+scene.add(Events);
+scene.add(item3)
+
+item4 = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 2.5), new THREE.MeshBasicMaterial({wireframe: false}));
+item4.userData = {
+  URL: "accomodation.html"
+};
+item4.geometry.translate(0,0,-item_position);
+geom[3].translate(-10,-item_position-10,0  );
+
+Engadget = new THREE.Mesh( geom[3], matLite );
+Engadget.userData = item4.userData;
+scene.add(Engadget);
+
+scene.add(item4)
+
+item5 = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 2.5), new THREE.MeshBasicMaterial({wireframe: false}));
+item5.userData = {
+  URL: "workshop.html"
+};
+item5.geometry.translate(0,-item_position,0);
+geom[4].translate(-item_position-30,10, 0  );
+stack = new THREE.Mesh( geom[4], matLite );
+stack.userData = item5.userData
+scene.add(stack)
+scene.add(item5)
+
+
+item6 = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 2.5), new THREE.MeshBasicMaterial({wireframe: false}));
+item6.userData = {
+  URL: "gallery.html"
+};
+item6.geometry.translate(-item_position,0,0);
+geom[5].translate(-25, 8 ,-item_position );
+google = new THREE.Mesh( geom[5], matLite );
+
+google.userData = item6.userData;
+scene.add(google);
+
+scene.add(item6)
+
+animate();
+
 })
 
 
-function init() {
-
-    var container = $("#container3d");
-
-  scene = new THREE.Scene();
-  /* camera positioning controls */
-  camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-  camera.lookAt(scene.position);
-  camera.position.z = 200;
-
-  renderer = new THREE.WebGLRenderer();
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(width, height);
-  /* background color */
-  renderer.setClearColor(0x000000);
-  renderer.shadowMap.enabled = true;
-  container.append(renderer.domElement);
 
 
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
+function animate() {
+    requestAnimationFrame( animate );
+    var rot_speed = -0.003;
+    sphere.rotation.y += rot_speed;
+    item1.rotation.y += rot_speed;
+    item2.rotation.y += rot_speed;
+    item3.rotation.y += rot_speed;
+    item4.rotation.y += rot_speed;
+    item5.rotation.y += rot_speed;
+    item6.rotation.y += rot_speed;
 
-  controls.minDistance = 100;
-controls.maxDistance = 500;
+    geohorizon.rotation.y += rot_speed;
+    timeline.rotation.y += rot_speed;
+    Events.rotation.y += rot_speed;
+    Engadget.rotation.y += rot_speed;
+    stack.rotation.y += rot_speed;
+    google.rotation.y += rot_speed;
+    
+    // sphere.rotation.y += 0.001;
 
+    renderer.render( scene, camera );
+    render()
+}
+function render(){
+    var particle_speed = 0.001;
+   
+    particles.rotation.x += particle_speed;
+    particles.rotation.y -= particle_speed;
 
-var x,y;
-
-
-  const ambientLight = new THREE.AmbientLight();
-  scene.add(ambientLight);
-  /* light controls (local sun) */
-  const light = new THREE.DirectionalLight();
-  light.position.set(200, 100, 200);
-  light.castShadow = false;
-  light.shadow.camera.left = -100;
-  light.shadow.camera.right = 100;
-  light.shadow.camera.top = 100;
-  light.shadow.camera.bottom = -100;
-  scene.add(light);
-
-  drawParticles();
-  drawsphere(container.parent());
-
-  document.getElementById('world').appendChild(renderer.domElement);
-
-
-      //
-  window.addEventListener('resize', onResize);
-//   animate();
-return true;
 }
 
-function onDocumentMouseDown(event) {
 
+
+function onDocumentMouseDown(event) {
+  items = [item1, item2, item3, item4, item5, item6];
+  names = [geohorizon,timeline,Events,Engadget,stack,google];
     event.preventDefault();
     var vector = new THREE.Vector3((event.clientX / window.innerWidth) * 2 -
         1, -(event.clientY / window.innerHeight) * 2 + 1, 0.5);
@@ -112,6 +265,8 @@ function onDocumentMouseDown(event) {
 
 function onDocumentTouchStart(event) {
     // event.preventDefault();
+    items = [item1, item2, item3, item4, item5, item6];
+    names = [geohorizon,timeline,Events,Engadget,stack,google];
     var vector = new THREE.Vector3((event.touches[0].clientX / window.innerWidth) * 2 -
         1, -(event.touches[0].clientY / window.innerHeight) * 2 + 1, 0.5);
     vector.unproject(camera);
@@ -255,223 +410,10 @@ function onDocumentMouseMove(event) {
 
   }
 
-/* responsive js */
-function onResize() {
-  width = window.innerWidth;
-  height = window.innerHeight;
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
-  renderer.setSize(width, height);
-}
 
-function animate() {
-  requestAnimationFrame(animate);
-
-  render();
-}
-/* stars rotation */
-function render() {
-    var rot_speed = 0.003;
-    var particle_speed = 0.001;
-    
-    particles.rotation.x += particle_speed;
-    particles.rotation.y -= particle_speed;
-    sphere.rotation.y += rot_speed;
-    // sphere.rotation.x += rot_speed;
-    // geohorizon.rotation.x += rot_speed;
-    geohorizon.rotation.y += rot_speed;
-    // Engadget.rotation.x += rot_speed;
-    Engadget.rotation.y += rot_speed;
-    // stack.rotation.x += rot_speed;
-    stack.rotation.y += rot_speed;
-    // timeline.rotation.x += rot_speed;
-    timeline.rotation.y += rot_speed;
-    // google.rotation.x += rot_speed;
-    google.rotation.y += rot_speed;
-    // Events.rotation.x += rot_speed;
-    Events.rotation.y += rot_speed;
-    for(var i = 0;i<=5;i++){
-        items[i].rotation.y += rot_speed;
-        // items[i].rotation.x += rot_speed;
-
-    }
-
-  renderer.render(scene, camera);
-}
-/* stars set up */
-function drawParticles() {
-  particles = new THREE.Group();
-  scene.add(particles);
-  const geometry = new THREE.TetrahedronGeometry(1, 1);
-  /* stars controls */
-  for (let i = 0; i < 800; i ++) {
-    const material = new THREE.MeshPhongMaterial({
-      color: colors[Math.floor(Math.random() * colors.length)],
-      shading: THREE.FlatShading
-    });
-    /* stars positioning */
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set((Math.random() - 0.5) * 1500,
-                      (Math.random() - 0.5) * 1500,
-                      (Math.random() - 0.5) * 1500);
-    mesh.updateMatrix();
-    mesh.matrixAutoUpdate = false;
-    particles.add(mesh);
-  }
-}
-/* sphere controls */
-function drawsphere(container) {
-    
-    var loader = new THREE.FontLoader();
-				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
-					var xMid;
-					var color = 0xffffff;
-					var matDark = new THREE.LineBasicMaterial( {
-						color: color,
-						side: THREE.DoubleSide
-					} );
-					var matLite = new THREE.MeshBasicMaterial( {
-						color: color,
-						transparent: true,
-						opacity:1,
-						side: THREE.DoubleSide
-					} );
-                    var message = ["About","Sponsors","Events","Accomodation","Workshops","Gallery"];
-                    var shapes = [];
-					var geom = [];
-
-                    for(var j=0;j<=5;j++){
-                        shapes.push(font.generateShapes( message[j], 5 ));
-                        geom.push(new THREE.ShapeBufferGeometry( shapes[j]));
-                        geom[j].computeBoundingBox();
-                  
-                    }
-            
-    
-
-  // var rotate_speed = {0.4,0.3,0};
-  sphere = new THREE.Group();
-//   sphere.rotation.set(0.4,0.3,0);
-  scene.add(sphere);
-  var radius = 100;
-  for(var i = 0;i<=5;i++){
-      var item_name;
-      // xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
-      // make shape ( N.B. edge view not visible )
-
-        item = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 2.5), new THREE.MeshBasicMaterial({wireframe: false}));
-        
-    var item_position = radius + 5.0;
-    switch (i) {
-        case 0:
-            item.userData = {
-                // URL: "http://google.com"
-               URL: "about.html"
-            };
-            item.geometry.translate(0, 0, item_position);
-            item.name = "Geohorizon";
-            geom[0].translate( -25, 8, item_position );
-            geohorizon = new THREE.Mesh( geom[i], matLite );
-            geohorizon.userData = item.userData;
-            scene.add( geohorizon );        
-            break;
-        case 1:
-            item.userData = {
-                URL: "sponsors.html"
-            };
-            item.geometry.translate(0, item_position, 0);
-            item.name = "sponsors";
-            geom[1].translate( -10,item_position+7,0 );
-            timeline = new THREE.Mesh( geom[i], matLite );
-            timeline.userData = item.userData;
-            scene.add( timeline );
-            break;
-        case 2:
-            item.userData = {
-                URL: "events.html"
-            };
-            item.geometry.translate(item_position,0,0);
-            item.name = "Events";
-            geom[2].translate(item_position,7, 0  );
-            Events = new THREE.Mesh( geom[i], matLite );
-            Events.userData = item.userData;
-            scene.add(Events);
-            break;
-        case 3:
-            item.userData = {
-                URL: "accomodation.html"
-            };
-            item.geometry.translate(0,-item_position,0);
-            item.name = "Accomodation";
-            // geom[3].rotation(0,0,0.5);
-            geom[3].translate(-10,-item_position-10,0  );
-
-            Engadget = new THREE.Mesh( geom[i], matLite );
-            // Engadget.rotation.set(new THREE.Vector3(0,0,0));
-            // Engadget.rotation.z = Math.PI/2;
-            Engadget.userData = item.userData;
-            scene.add(Engadget);
-            break;
-        case 4:
-            item.userData = {
-                URL: "workshop.html"
-            };
-            item.geometry.translate(-item_position,0,0);
-            item.name = "Workshops";
-            geom[4].translate(-item_position-30,10, 0  );
-            stack = new THREE.Mesh( geom[i], matLite );
-            stack.userData = item.userData;
-            scene.add(stack);
-            break;
-        case 5:
-            item.userData = {
-                URL: "gallery.html"
-            };
-            item.geometry.translate(0, 0,-item_position);			
-            item.name = "Gallery";
-            geom[5].translate(-25, 8 ,-item_position );
-            google = new THREE.Mesh( geom[i], matLite );
-            google.userData = item.userData;
-            scene.add(google);
-            break;
-    }
-    scene.add(item);
-    items.push(item);
-    names = [geohorizon,timeline,Events,Engadget,stack,google];
-
-  }
-// var svg_loader = new THREE.SVGLoader();
-// svg_loader.load('world.svg');
-  const planetGeometry = new THREE.IcosahedronGeometry(radius,5);
-
-  var planetMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff,wireframe:true,wireframeLinejoin:"miter",wireframeLinewidth:"0.1" } );
-  THREE.ImageUtils.crossOrigin = '';
-
-
-    var img = 'https://vignette.wikia.nocookie.net/marvelcrossroads/images/7/71/Earth-map.jpg/revision/latest?cb=20180513012905';
-    
-    // planetMaterial.map    = THREE.SVGLoader('world.svg');
-
-  planetMaterial.map    = THREE.ImageUtils.loadTexture(img);
-//   planetMaterial.map    = THREE.TextureLoader(img);
-
-  planet = new THREE.Mesh(planetGeometry, planetMaterial);
-  /* sphere shadow */
-  planet.castShadow = true;
-  planet.receiveShadow = true;
-  planet.position.set(0,0, 0);
-  sphere.add(planet);
- 
-//   container.on("mousedown", onMouseDown);
-//   container.on("mouseup", onMouseUp);
 
   document.addEventListener('click', onDocumentMouseDown,false);
   document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 //   $(document).on("mousemove", onMouseMove);
 
   document.addEventListener('touchstart',onDocumentTouchStart,false);
-//   document.addEventListener('touchmove',onDocumentTouchMove,false);
-
-});
-
-}
