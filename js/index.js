@@ -165,7 +165,7 @@ scene.add(item3)
 
 item4 = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 2.5), new THREE.MeshBasicMaterial({wireframe: false}));
 item4.userData = {
-  URL: "accomodation.html"
+  URL: "gallery.html"
 };
 item4.geometry.translate(0,0,-item_position);
 geom[3].translate(-10,-item_position-10,0  );
@@ -178,7 +178,7 @@ scene.add(item4)
 
 item5 = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 2.5), new THREE.MeshBasicMaterial({wireframe: false}));
 item5.userData = {
-  URL: "workshop.html"
+  URL: "accomodation.html"
 };
 item5.geometry.translate(0,-item_position,0);
 geom[4].translate(-item_position-30,10, 0  );
@@ -190,7 +190,7 @@ scene.add(item5)
 
 item6 = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 2.5), new THREE.MeshBasicMaterial({wireframe: false}));
 item6.userData = {
-  URL: "gallery.html"
+  URL: "workshop.html"
 };
 item6.geometry.translate(-item_position,0,0);
 geom[5].translate(-25, 8 ,-item_position );
