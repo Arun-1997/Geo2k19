@@ -136,7 +136,7 @@ item1.userData = {
 item1.geometry.translate(0,0,item_position);
 geom[0].translate( -13, 8, item_position )
 geohorizon = new THREE.Mesh( geom[0], matLite );
-geohorizon.userData = item1.userData;
+// geohorizon.userData = item1.userData;
 scene.add( geohorizon );      
 scene.add(item1)
 
@@ -148,7 +148,7 @@ item2.userData = {
 item2.geometry.translate(0,item_position,0);
 geom[1].translate( -10,item_position+7,0 );
 timeline = new THREE.Mesh( geom[1], matLite );
-timeline.userData = item2.userData;
+// timeline.userData = item2.userData;
 scene.add(timeline);
 scene.add(item2)
 
@@ -159,7 +159,7 @@ item3.userData = {
 item3.geometry.translate(item_position,0,0);
 geom[2].translate(item_position,7, 0  );
 Events = new THREE.Mesh( geom[2], matLite );
-Events.userData = item3.userData
+// Events.userData = item3.userData
 scene.add(Events);
 scene.add(item3)
 
@@ -171,7 +171,7 @@ item4.geometry.translate(0,0,-item_position);
 geom[3].translate(-10,-item_position-10,0  );
 
 Engadget = new THREE.Mesh( geom[3], matLite );
-Engadget.userData = item4.userData;
+// Engadget.userData = item4.userData;
 scene.add(Engadget);
 
 scene.add(item4)
@@ -183,7 +183,7 @@ item5.userData = {
 item5.geometry.translate(0,-item_position,0);
 geom[4].translate(-item_position-30,10, 0  );
 stack = new THREE.Mesh( geom[4], matLite );
-stack.userData = item5.userData
+// stack.userData = item5.userData;
 scene.add(stack)
 scene.add(item5)
 
@@ -196,7 +196,7 @@ item6.geometry.translate(-item_position,0,0);
 geom[5].translate(-25, 8 ,-item_position );
 google = new THREE.Mesh( geom[5], matLite );
 
-google.userData = item6.userData;
+// google.userData = item6.userData;
 scene.add(google);
 
 scene.add(item6)
